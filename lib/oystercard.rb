@@ -1,13 +1,12 @@
 class OysterCard
-  attr_reader :balance, :entry_station
-  attr_accessor :state
+  attr_reader :balance
+  attr_accessor :entry_station
 
   LIMIT = 90
   MINIMUM_BALANCE = 1
 
   def initialize
     @balance = 0
-    @state = false
     @entry_station = nil
   end
 
@@ -18,18 +17,16 @@ class OysterCard
   end
 
   def in_journey?
-    @state
+    @entry_station ? true : false
   end
 
   def touch_in(station)
     fail "Balance too low!" unless suff_funds?
-    @state = true
     @entry_station = station
   end
 
   def touch_out
     deduct(MINIMUM_BALANCE)
-    @state = false
     @entry_station = nil
   end
 

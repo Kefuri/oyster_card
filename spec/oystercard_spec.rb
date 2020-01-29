@@ -23,7 +23,7 @@ describe OysterCard do
     end
 
     it 'should return true if card is tapped in' do
-      oyster.state = true
+      oyster.entry_station = "Liverpool Street"
       expect(oyster).to be_in_journey
     end
   end
@@ -73,3 +73,28 @@ describe OysterCard do
     end
   end
 end
+
+# describe OysterCard do
+#   subject(:oyster) { described_class.new }
+#   let(:station) {double("fake station")}
+#   context "requires a top up and touch in" do
+#     before(:example) do
+#       allow(station).to receive(:name) { 'Liverpool Street' }
+#       min_bal = OysterCard::MINIMUM_BALANCE
+#       oyster.top_up(min_bal)
+#       oyster.touch_in(station.name)
+#     end
+
+#     describe "#touch_out" do
+#       it "testing test structure, should be in journey" do
+#         oyster.touch_out
+#         expect(oyster).not_to be_in_journey
+#       end
+#       it "should forget the entry station when tapping out" do
+#         expect{ oyster.touch_out }.to change { oyster.entry_station }.from(station.name).to(nil)
+#       end
+#     end
+#   end
+# end
+
+
