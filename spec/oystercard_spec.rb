@@ -2,8 +2,13 @@ require 'oystercard'
 describe OysterCard do
   subject(:oyster) { described_class.new }
   let(:station) {double("fake station")}
+
   it 'returns a balance of 0' do
     expect(oyster.balance).to eq 0
+  end
+
+  it ' initializes an empty array' do 
+    expect(oyster.journeys).to eq []
   end
 
   describe "#top_up" do
@@ -51,33 +56,46 @@ describe OysterCard do
     it "should change state to false" do
       min_bal = OysterCard::MINIMUM_BALANCE
       oyster.top_up(min_bal)
-      allow(station).to receive(:name) { "Liverpool Street" }
+      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
       oyster.touch_in(station.name)
-      oyster.touch_out
+      oyster.touch_out(station.name)
       expect(oyster).not_to be_in_journey
     end
 
     it "should deduct the minimum fare from balance" do
       min_bal = OysterCard::MINIMUM_BALANCE
       oyster.top_up(min_bal)
-      allow(station).to receive(:name) { "Liverpool Street" }
+      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
       oyster.touch_in(station.name)
-      expect { oyster.touch_out }.to change { oyster.balance }.by(-min_bal)
+      expect { oyster.touch_out(station.name) }.to change { oyster.balance }.by(-min_bal)
     end
 
     it "should forget the entry station when tapping out" do
-      allow(station).to receive(:name) { 'Liverpool Street' }
+      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
       oyster.top_up(OysterCard::MINIMUM_BALANCE)
       oyster.touch_in(station.name)
-      expect(oyster.touch_out).to eq nil
+      expect(oyster.touch_out(station.name)).to eq nil
     end
   end
+
+  describe "#create_journey" do
+    it 'responds to create_journey' do
+      expect(oyster).to respond_to(:create_journey).with(2).arguments
+    end
+
+    it 'should create a hash with the entry and exit journey' do
+      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
+      expect(oyster.create_journey(station.name, station.name)).to eq({"JID"=>1, "Entry"=>"Liverpool Street", "Exit"=>"Stratford"})
+    end
+  end 
 end
 
 # describe OysterCard do
 #   subject(:oyster) { described_class.new }
 #   let(:station) {double("fake station")}
+
 #   context "requires a top up and touch in" do
+
 #     before(:example) do
 #       allow(station).to receive(:name) { 'Liverpool Street' }
 #       min_bal = OysterCard::MINIMUM_BALANCE
@@ -86,6 +104,9 @@ end
 #     end
 
 #     describe "#touch_out" do
+#       it "should accept an exit station when tapping out" do
+#         expect(oyster).to respond_to(:touch_out).with(1).arguments
+#       end
 #       it "testing test structure, should be in journey" do
 #         oyster.touch_out
 #         expect(oyster).not_to be_in_journey
@@ -93,6 +114,7 @@ end
 #       it "should forget the entry station when tapping out" do
 #         expect{ oyster.touch_out }.to change { oyster.entry_station }.from(station.name).to(nil)
 #       end
+
 #     end
 #   end
 # end
