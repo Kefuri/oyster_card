@@ -76,6 +76,15 @@ describe OysterCard do
       oyster.touch_in(station.name)
       expect(oyster.touch_out(station.name)).to eq nil
     end
+
+    it "should create a journey once touched out" do
+      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
+      oyster.top_up(OysterCard::MINIMUM_BALANCE)
+      oyster.touch_in(station.name)
+      oyster.touch_out(station.name)
+      expect(oyster.journeys.length).to eq 1
+    end
+
   end
 
   describe "#create_journey" do
@@ -85,7 +94,10 @@ describe OysterCard do
 
     it 'should create a hash with the entry and exit journey' do
       allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
-      expect(oyster.create_journey(station.name, station.name)).to eq({"JID"=>1, "Entry"=>"Liverpool Street", "Exit"=>"Stratford"})
+      oyster.top_up(OysterCard::MINIMUM_BALANCE)
+      oyster.touch_in(station.name)
+      oyster.touch_out(station.name)
+      expect(oyster.journeys[0]).to eq({ :jid =>1, :entry_station => "Liverpool Street", :exit_station => "Stratford" })
     end
   end 
 end

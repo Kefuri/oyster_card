@@ -28,11 +28,13 @@ class OysterCard
 
   def touch_out(exit_station)
     deduct(MINIMUM_BALANCE)
+    create_journey(@entry_station, exit_station)
     @entry_station = nil
   end
 
   def create_journey(entry_station, exit_station)
-    journey = {"JID" => (@journeys.length + 1), "Entry" => entry_station, "Exit" => exit_station}
+    journey = {:jid => (@journeys.length + 1), :entry_station => entry_station, :exit_station => exit_station}
+    @journeys << journey
   end
   
   private
