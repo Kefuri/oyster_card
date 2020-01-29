@@ -1,6 +1,7 @@
 require 'oystercard'
 describe OysterCard do
   subject(:oyster) { described_class.new }
+  let(:station) {double("fake station")}
   it 'returns a balance of 0' do
     expect(oyster.balance).to eq 0
   end
@@ -13,13 +14,6 @@ describe OysterCard do
     it 'raises an error if balance exceeds limit' do
       oyster.top_up(OysterCard::LIMIT)
       expect{ oyster.top_up(1) }.to raise_error("Cannot top-up over £#{described_class::LIMIT} limit")
-    end
-  end
-
-  describe "#deduct" do
-    it 'should deduct the specified fare from balance' do
-      oyster.top_up(10)
-      expect { oyster.deduct(8) }.to change { oyster.balance }.by -8
     end
   end
 
@@ -37,22 +31,45 @@ describe OysterCard do
     it "should change state to true" do
       min_bal = OysterCard::MINIMUM_BALANCE
       oyster.top_up(min_bal)
-      oyster.touch_in
+      allow(station).to receive(:name) { "Liverpool Street" }
+      oyster.touch_in(station.name)
       expect(oyster).to be_in_journey
     end
     it "should raise an error when balance is too low" do
-      expect { oyster.touch_in }.to raise_error("Balance too low!")
+      allow(station).to receive(:name) { "Liverpool Street" }
+      expect { oyster.touch_in(station.name) }.to raise_error("Balance too low!")
     end
-      
+
+    it "should remember an entry station when tapped" do
+      allow(station).to receive(:name) { "Liverpool Street" }
+      oyster.top_up(OysterCard::MINIMUM_BALANCE)
+      oyster.touch_in(station.name)
+      expect(oyster.entry_station).to eq("Liverpool Street")
+    end
   end
   describe "#touch_out" do
     it "should change state to false" do
       min_bal = OysterCard::MINIMUM_BALANCE
       oyster.top_up(min_bal)
-      oyster.touch_in
+      allow(station).to receive(:name) { "Liverpool Street" }
+      oyster.touch_in(station.name)
       oyster.touch_out
       expect(oyster).not_to be_in_journey
     end
-  end
 
+    it "should deduct the minimum fare from balance" do
+      min_bal = OysterCard::MINIMUM_BALANCE
+      oyster.top_up(min_bal)
+      allow(station).to receive(:name) { "Liverpool Street" }
+      oyster.touch_in(station.name)
+      expect { oyster.touch_out }.to change { oyster.balance }.by(-min_bal)
+    end
+
+    it "should forget the entry station when tapping out" do
+      allow(station).to receive(:name) { 'Liverpool Street' }
+      oyster.top_up(OysterCard::MINIMUM_BALANCE)
+      oyster.touch_in(station.name)
+      expect(oyster.touch_out).to eq nil
+    end
+  end
 end
