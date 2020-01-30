@@ -102,33 +102,37 @@ describe OysterCard do
   end 
 end
 
-# describe OysterCard do
-#   subject(:oyster) { described_class.new }
-#   let(:station) {double("fake station")}
+describe OysterCard do
+  subject(:oyster) { described_class.new }
+  let(:station) {double("fake station")}
 
-#   context "requires a top up and touch in" do
+  context "requires a top up and touch in" do
 
-#     before(:example) do
-#       allow(station).to receive(:name) { 'Liverpool Street' }
-#       min_bal = OysterCard::MINIMUM_BALANCE
-#       oyster.top_up(min_bal)
-#       oyster.touch_in(station.name)
-#     end
+    before(:example) do
+      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
+      min_bal = OysterCard::MINIMUM_BALANCE
+      oyster.top_up(min_bal)
+      oyster.touch_in(station.name)
+    end
 
-#     describe "#touch_out" do
-#       it "should accept an exit station when tapping out" do
-#         expect(oyster).to respond_to(:touch_out).with(1).arguments
-#       end
-#       it "testing test structure, should be in journey" do
-#         oyster.touch_out
-#         expect(oyster).not_to be_in_journey
-#       end
-#       it "should forget the entry station when tapping out" do
-#         expect{ oyster.touch_out }.to change { oyster.entry_station }.from(station.name).to(nil)
-#       end
-
-#     end
-#   end
-# end
+    describe "#touch_out" do
+      it "should accept an exit station when tapping out" do
+        expect(oyster).to respond_to(:touch_out).with(1).arguments
+      end
+      it "should not be in journey after touching out" do
+        oyster.touch_out(station.name)
+        expect(oyster).not_to be_in_journey
+      end
+      it "should forget the entry station when tapping out" do
+        expect{ oyster.touch_out(station.name) }.to change { oyster.entry_station }.to(nil)
+      end
+      it "should create a journey once touched in and out" do
+        oyster.touch_out(station.name)
+        p oyster.journeys
+        expect(oyster.journeys.length).to eq 1
+      end
+    end
+  end
+end
 
 
