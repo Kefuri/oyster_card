@@ -128,8 +128,9 @@ describe OysterCard do
       end
       it "should create a journey once touched in and out" do
         oyster.touch_out(station.name)
-        p oyster.journeys
         expect(oyster.journeys.length).to eq 1
+      end
+      it "should deduct the minimum balance on touch out" do
       end
     end
   end
