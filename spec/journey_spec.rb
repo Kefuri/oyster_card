@@ -1,21 +1,29 @@
 require 'journey'
 
 describe Journey do
-  subject(:journey) { described_class.new("Liverpool Street", "Hyde Park") }
+  subject(:journey) { described_class.new }
+  let(:entry_station) {double("Liverpool Street")}
+  let(:exit_station) {double("Hyde Park")}
  
   it "#starts a journey" do
-    expect(journey.journey_start).to eq("Liverpool Street")
+    journey.write_journey_start(entry_station)
+    expect(journey.journey_start).to eq(entry_station)
   end
 
   it "#end a journey" do
-    expect(journey.journey_end).to eq("Hyde Park")
+    journey.write_journey_end(exit_station)
+    expect(journey.journey_end).to eq(exit_station)
   end
 
   it "#get_journey shows us our journey" do
-    expect(journey.get_journey).to eq("Journey from Liverpool Street to Hyde Park")
+    journey.write_journey_start(entry_station)
+    journey.write_journey_end(exit_station)
+    expect(journey.get_journey).to eq("Journey from #{entry_station} to #{exit_station}")
   end
 
   it "should know that a journey is complete" do
+    journey.write_journey_start(entry_station)
+    journey.write_journey_end(exit_station)
     expect(journey).to be_complete
   end
 
@@ -25,6 +33,8 @@ describe Journey do
   end
 
   it "should calculate a fare for a complete journey" do
+    journey.write_journey_start(entry_station)
+    journey.write_journey_end(exit_station)
     expect(journey.calculate).to eq(Journey::MINIMUM_FARE)
   end
 

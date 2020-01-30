@@ -6,6 +6,7 @@ class Journey
   def initialize(entry_station = nil, exit_station = nil)
     @entry_station = entry_station
     @exit_station = exit_station
+    @fare = 0
   end
   
   def journey_start
@@ -16,12 +17,16 @@ class Journey
     @exit_station
   end
 
-  def write_journey_start(station)
-    @entry_station = station
+  def fare
+    @fare
   end
 
-  def write_journey_end(station)
-    @exit_station = station
+  def write_journey_start(entry_station)
+    @entry_station = entry_station
+  end
+
+  def write_journey_end(exit_station)
+    @exit_station = exit_station
   end
   
   def get_journey
@@ -33,7 +38,7 @@ class Journey
   end
 
   def calculate
-    complete? ? MINIMUM_FARE : PENALTY_FARE
+    @fare = complete? ? MINIMUM_FARE : PENALTY_FARE
   end
 
 end
