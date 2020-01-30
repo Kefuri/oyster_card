@@ -22,7 +22,7 @@ class OysterCard
   end
 
   def touch_in(station)
-    fail "Balance too low!" unless suff_funds?
+    fail "Balance too low!" unless sufficient_funds?
     @entry_station = station
   end
 
@@ -38,7 +38,7 @@ class OysterCard
   end
   
   private
-  def suff_funds?
+  def sufficient_funds?
     @balance >= MINIMUM_BALANCE
   end
 
