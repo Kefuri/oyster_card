@@ -1,3 +1,5 @@
+require "journey"
+require "station"
 class OysterCard
   attr_reader :balance, :journeys
   attr_accessor :entry_station
@@ -23,12 +25,18 @@ class OysterCard
 
   def touch_in(station)
     fail "Balance too low!" unless sufficient_funds?
+    @journeys << start_journey(station)
     @entry_station = station
+  end
+
+  def start_journey(station)
+    new_journey = Journey.new
+    new_journey.write_journey_start(station)
+    return new_journey
   end
 
   def touch_out(exit_station)
     deduct(MINIMUM_BALANCE)
-    create_journey(@entry_station, exit_station)
     @entry_station = nil
   end
 

@@ -29,9 +29,10 @@ describe OysterCard do
 
     it 'should return true if card is tapped in' do
       oyster.entry_station = "Liverpool Street"
-      expect(oyster).to be_in_journey
+      expect(oyster).to be_in_journey 
     end
   end
+
   describe "#touch_in" do
     it "should change state to true" do
       min_bal = OysterCard::MINIMUM_BALANCE
@@ -87,24 +88,47 @@ describe OysterCard do
 
   end
 
-  describe "#create_journey" do
-    it 'responds to create_journey' do
-      expect(oyster).to respond_to(:create_journey).with(2).arguments
-    end
+  # describe "#create_journey" do
+  #   it 'responds to create_journey' do
+  #     expect(oyster).to respond_to(:create_journey).with(2).arguments
+  #   end
 
-    it 'should create a hash with the entry and exit journey' do
-      allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
-      oyster.top_up(OysterCard::MINIMUM_BALANCE)
-      oyster.touch_in(station.name)
-      oyster.touch_out(station.name)
-      expect(oyster.journeys[0]).to eq({ :jid =>1, :entry_station => "Liverpool Street", :exit_station => "Stratford" })
-    end
-  end 
+  #   it 'should create a hash with the entry and exit journey' do
+  #     allow(station).to receive(:name).and_return('Liverpool Street', 'Stratford')
+  #     oyster.top_up(OysterCard::MINIMUM_BALANCE)
+  #     oyster.touch_in(station.name)
+  #     oyster.touch_out(station.name)
+  #     expect(oyster.journeys[0]).to eq({ :jid =>1, :entry_station => "Liverpool Street", :exit_station => "Stratford" })
+  #   end
+  # end 
 end
 
 describe OysterCard do
   subject(:oyster) { described_class.new }
   let(:station) {double("fake station")}
+  let(:journey) {double("Journey")}
+
+
+  context "requires top up" do
+    before(:example) do
+      allow(station).to receive(:name).and_return('Liverpool Street')
+      min_bal = OysterCard::MINIMUM_BALANCE
+      oyster.top_up(min_bal)
+    end
+    
+    describe "#touch_in" do
+      it "should initalize a new journey and put it in the journeys array" do
+        expect { oyster.touch_in(station.name) }.to change {oyster.journeys.length}.by 1
+      end
+
+      it "should check if a journey was incomplete when touching in again" do
+        oyster.touch_in(station.name)
+        oyster.touch_in(station.name)
+        expect(oyster.journeys[0].current_fare).to eq Journey::PENALTY_FARE
+      end 
+    end
+  end
+
 
   context "requires a top up and touch in" do
 
@@ -129,8 +153,6 @@ describe OysterCard do
       it "should create a journey once touched in and out" do
         oyster.touch_out(station.name)
         expect(oyster.journeys.length).to eq 1
-      end
-      it "should deduct the minimum balance on touch out" do
       end
     end
   end

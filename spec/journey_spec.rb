@@ -42,4 +42,8 @@ describe Journey do
     test_journey = Journey.new("Start")
     expect(test_journey.calculate).to eq(Journey::PENALTY_FARE)
   end
+  it "should calculate a fare for an incomplete journey" do
+    test_journey = Journey.new(nil, "End")
+    expect(test_journey.calculate).to eq(Journey::PENALTY_FARE)
+  end
 end

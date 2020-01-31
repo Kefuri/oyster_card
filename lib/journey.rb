@@ -17,7 +17,8 @@ class Journey
     @exit_station
   end
 
-  def fare
+  def current_fare
+    calculate
     @fare
   end
 
